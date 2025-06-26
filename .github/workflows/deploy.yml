@@ -1,33 +1,66 @@
 name: Deploy to HostAfrica
-on: [push]
+on:
+  push:
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('package-lock.json') }}
+          
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
-      - run: npm ci
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Verify FTP Connection
+      - name: Build static site
+        run: npm run build
+
+      # Verify network connectivity
+      - name: Test FTP server connection
         run: |
-          nc -zv ftp.sminfinitetech.co.za 21
-          curl -v ftp://ftp.sminfinitetech.co.za
+          echo "Testing connection to FTP server..."
+          nc -zv ${{ secrets.FTP_SERVER }} 21
+          
+      # Critical: Verify credentials before deployment
+      - name: Verify FTP Credentials
+        run: |
+          echo "Testing authentication..."
+          curl -v -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+          ftp://${{ secrets.FTP_SERVER }}/
 
+      # Main deployment step
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
-          server: ftp.sminfinitetech.co.za
+          server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /public_html/
+          local-dir: ./out/
+          server-dir: ${{ secrets.REMOTE_DIR }}
           protocol: ftp
-          ftp-passive: true # Critical for HostAfrica
-          security: loose # Bypass TLS if needed
+          ftp-passive: true   # Required for HostAfrica
+          security: loose     # Bypass strict TLS requirements
           dangerous-clean-slate: true
+          exclude: |
+            .git*
+            .github*
+            README.md
+
+      # Post-deployment verification
+      - name: Check deployed site
+        run: |
+          echo "Deployment complete! Verify at:"
+          echo "https://${{ secrets.DOMAIN }}"
