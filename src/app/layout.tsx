@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+export const metadata : Metadata = {
   title: 'SM Infinite Tech | Leading Software & Digital Agency in South Africa',
   description: 'Premier software development and digital solutions provider. Web, mobile, cloud, and AI services for businesses across South Africa.',
   metadataBase: new URL('https://sminfinitetech.co.za'),
@@ -34,9 +34,7 @@ export const metadata: Metadata = {
     locale: 'en_ZA',
     type: 'website',
   },
-  icons: {
-    icon: '/favicon.png',
-  },
+  
 };
 
 export default function RootLayout({
