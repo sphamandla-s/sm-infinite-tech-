@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 
 export default function page() {
   return (
-    <main>
+    <main className='bg-white/80 dark:bg-black/80'>
       <Navbar />
       <Hero />
       {/* <Coming /> */}
