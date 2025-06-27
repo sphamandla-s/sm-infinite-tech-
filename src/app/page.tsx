@@ -1,11 +1,13 @@
 'use client';
-import { Coming } from './components/Coming';
+import { Hero } from './components/Hero';
+import Navbar from './components/Navbar';
 
 export default function page() {
   return (
     <main>
-      {/* <Hero /> */}
-      <Coming />
+      <Navbar />
+      <Hero />
+      {/* <Coming /> */}
     </main>
   );
 }
