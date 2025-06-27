@@ -1,10 +1,11 @@
 'use client';
-import { Hero } from './components/Hero';
+import { Coming } from './components/Coming';
 
 export default function page() {
   return (
     <main>
-      <Hero />
+      {/* <Hero /> */}
+      <Coming />
     </main>
   );
 }
